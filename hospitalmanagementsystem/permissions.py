@@ -21,3 +21,7 @@ class IsReceptionist(BasePermission):
 class IsAdminOrReceptionist(BasePermission):
     def has_permission(self, request, view):
         return request.user.role in ['admin', 'receptionist']
+    
+class IsDoctorOrReceptionist(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.role in ['doctor','receptionist']
