@@ -11,6 +11,9 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from hospitalmanagementsystem.permissions import IsAdmin
 from rest_framework.authentication import SessionAuthentication
+from .tasks import send_login_email,send_signup_email
+from hospitalmanagementsystem import settings
+
 
 class AuthViewSet(viewsets.ViewSet):
     authentication_classes=[JWTAuthentication]
@@ -24,6 +27,7 @@ class AuthViewSet(viewsets.ViewSet):
         if serializer.is_valid():
             user=serializer.save()
             refresh=RefreshToken.for_user(user=user)
+            send_signup_email.delay(receiver=user.email,subject='Account Registered Successfully',message=f'Hello {user.name}, You have Created Your account Successfully.',sender=settings.DEFAULT_FROM_EMAIL)
             return Response({
                 'message': 'User registered successfully',
                 'role': user.role,
@@ -40,6 +44,7 @@ class AuthViewSet(viewsets.ViewSet):
         if user is None:
             return Response({'message':'Invalid Credentials'})
         refresh=RefreshToken.for_user(user)
+        send_login_email.delay(receiver=user.email,subject='Account Logged in Successfully',message=f'Hello {user.name}, You have Logged in to Your account Successfully.',sender=settings.DEFAULT_FROM_EMAIL)
         return Response({
             'name':user.name,
             'role':user.role,

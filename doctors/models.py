@@ -35,4 +35,4 @@ class Appointments(models.Model):
         unique_together=['doctor','appointment_time','appointment_date']
     
     def __str__(self):
-        return f"{self.patient.name} → Dr.{self.doctor.name} | {self.appointment_date}"
+        return f"{self.patient.user.name} → Dr.{self.doctor.user.name} | {self.appointment_date}"

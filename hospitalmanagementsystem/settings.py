@@ -1,6 +1,7 @@
 from datetime import timedelta
 from pathlib import Path
 from decouple import config
+from .celery import app as celery_app
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -29,6 +30,7 @@ INSTALLED_APPS = [
     'accounts',
     'patients',
     'doctors',
+    'celery',
 ]
 
 MIDDLEWARE = [
@@ -137,5 +139,13 @@ EMAIL_HOST="smtp.gmail.com"
 EMAIL_PORT=587
 EMAIL_USE_TLS=True
 EMAIL_HOST_USER="moinmail001@gmail.com"
-DEFAULT_FROM_EMAIL="moinmail001@gmail.com"
+DEFAULT_FROM_EMAIL="moinmail002@gmail.com"
 EMAIL_HOST_PASSWORD=config('EMAIL_HOST_PASSWORD')
+
+
+
+
+
+
+CELERY_BROKER_URL = config('CELERY_BROKER_URL', default='redis://127.0.0.1:6379/0')
+CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', default='redis://127.0.0.1:6379/0')
