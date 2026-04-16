@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up | HMS{% endblock %}
+
+{% block content %}
+<h2>Create account</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Sign Up</button>
+</form>
+<p><a href="{% url 'login' %}">Login</a></p>
+{% endblock %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign Up | HMS</title>
+</head>
+<body>
+  <h2>Create account</h2>
+  <p>Hospital Management System</p>
+
+  {% if messages %}
+    {% for message in messages %}
+      <p>{{ message }}</p>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+
+    {# Renders all form fields with labels and errors #}
+    {{ form.as_p }}
+
+    <button type="submit">Sign Up</button>
+  </form>
+
+  <p>
+    Already have an account?
+    <a href=">Login</a>
+  </p>
+</body>
+</html>

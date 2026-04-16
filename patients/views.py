@@ -13,6 +13,67 @@ from rest_framework import status
 from .serializers import PatientSerializer,MedicalHistorySerializer
 from rest_framework.authentication import SessionAuthentication
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.views.generic import ListView,DetailView
+from django.views.generic.edit import CreateView
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect
+
+
+
+class PatientListView(ListView):
+    model=PatientProfile
+    template_name='patients_list.html'
+    context_object_name='patients'
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated or getattr(request.user, 'role', None) not in ['doctor', 'receptionist', 'admin']:
+            return redirect('dashboard')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return PatientProfile.objects.select_related('user').all()
+
+
+class PatientDetailView(DetailView):
+    model=PatientProfile
+    template_name='patient_details.html'
+    context_object_name='patient'
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('login')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        queryset = PatientProfile.objects.select_related('user').prefetch_related('medical_histories__doctor', 'appointments__doctor__user')
+        role = getattr(self.request.user, 'role', None)
+
+        if role == 'patient':
+            return queryset.filter(user=self.request.user)
+        if role in ['doctor', 'receptionist', 'admin']:
+            return queryset
+        return queryset.none()
+
+
+class MedicalHistoryCreateView(LoginRequiredMixin, CreateView):
+    model = MedicalHistory
+    fields = ['diagnosis', 'treatment', 'prescribed_medications', 'notes']
+    template_name = 'medical_history_form.html'
+    success_url = reverse_lazy('dashboard')
+
+    def dispatch(self, request, *args, **kwargs):
+        if getattr(request.user, 'role', None) != 'doctor':
+            return redirect('dashboard')
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        patient = PatientProfile.objects.filter(pk=self.kwargs.get('pk')).first()
+        if patient is None:
+            return redirect('dashboard')
+        form.instance.patient = patient
+        form.instance.doctor = self.request.user
+        return super().form_valid(form)
 
 class PatientViewset(ViewSet):
     authentication_classes=[SessionAuthentication,JWTAuthentication]

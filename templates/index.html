@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Home | HMS{% endblock %}
+
+{% block content %}
+<h2>Welcome to Hospital Management System</h2>
+
+{% if user.is_authenticated %}
+  <p>You are logged in as {{ user.name }} ({{ user.role }}).</p>
+  <form method="post" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button type="submit">Logout</button>
+  </form>
+{% else %}
+  <p>
+    <a href="{% url 'register' %}">Signup</a>
+    <a href="{% url 'login' %}">Login</a>
+  </p>
+{% endif %}
+
+<p>This frontend is plain Django HTML and is connected to the backend views.</p>
+{% endblock %}<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Management System</title>
+</head>
+<body>
+    <center>
+
+        <h1>Welcome to Hospital Management System</h1>
+    </center>
+    {% if user.is_authenticated %}
+<form method="post" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button type="submit">Logout</button>
+</form>
+    {% else %}
+    <a href="{% url "register" %}">Signup</a>
+    <br>
+    <a href="{% url "login" %}">Login</a>
+    {% endif %}
+</body>
+</html>

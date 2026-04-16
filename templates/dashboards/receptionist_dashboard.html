@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Receptionist Dashboard | HMS{% endblock %}
+
+{% block content %}
+<h2>Receptionist Dashboard</h2>
+<h3>All Appointments</h3>
+<ul>
+  {% for appointment in appointments %}
+    <li>
+      {{ appointment.appointment_date }} {{ appointment.appointment_time }}
+      - {{ appointment.patient.user.name }} with Dr. {{ appointment.doctor.user.name }}
+      - {{ appointment.status }}
+      {% if appointment.status != 'completed' and appointment.status != 'cancelled' %}
+        <form method="post" action="{% url 'appointment-status-update-frontend' appointment.pk %}">
+          {% csrf_token %}
+          <select name="status">
+            <option value="pending" {% if appointment.status == 'pending' %}selected{% endif %}>Pending</option>
+            <option value="confirmed" {% if appointment.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
+            <option value="cancelled" {% if appointment.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+          </select>
+          <button type="submit">Update Status</button>
+        </form>
+      {% endif %}
+    </li>
+  {% empty %}
+    <li>No appointments found.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Hospital Management System{% endblock %}</title>
+</head>
+<body>
+  <header>
+    <h1>Hospital Management System</h1>
+    <nav>
+      <a href="{% url 'homepage' %}">Home</a> |
+      <a href="{% url 'patients' %}">Patients</a> |
+      <a href="{% url 'doctors' %}">Doctors</a> |
+      <a href="{% url 'book_appointment' %}">Book Appointment</a> |
+            <a href="{% url 'dashboard' %}">Dashboard</a> |
+            {% if user.is_authenticated %}
+                <a href="{% url 'profile' %}">Profile</a>
+            {% endif %}
+    </nav>
+    <hr>
+  </header>
+
+  {% if messages %}
+    {% for message in messages %}
+      <p>{{ message }}</p>
+    {% endfor %}
+  {% endif %}
+
+  {% block content %}{% endblock %}
+</body>
+</html>
+{% comment %} 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Hospital Management System{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/hms.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+{% if user.is_authenticated %}
+
+<!-- ===== Navbar ===== -->
+<nav class="navbar">
+    <a href="" class="navbar-brand">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        HMS
+    </a>
+    <div class="navbar-right">
+        <span class="user-info">{{ user.get_full_name|default:user.username }}</span>
+        <form method="post" action="{% url 'logout' %}" style="margin:0;">
+            {% csrf_token %}
+            <button type="submit" class="logout-btn">Logout</button>
+        </form>
+    </div>
+</nav>
+
+<!-- ===== Layout ===== -->
+<div class="layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-section">
+            <div class="sidebar-label">Main</div>
+            <a href="{% url 'dashboard' %}" class="sidebar-link {% block nav_dashboard %}{% endblock %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                    <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+                </svg>
+                Dashboard
+            </a>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-label">Patients</div>
+            <a href="{% url 'patient-list' %}" class="sidebar-link {% block nav_patients %}{% endblock %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+                All Patients
+            </a>
+            <a href="{% url 'patient-create' %}" class="sidebar-link {% block nav_patient_add %}{% endblock %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"/>
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                Add Patient
+            </a>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-label">Appointments</div>
+            <a href="{% url 'appointment-list' %}" class="sidebar-link {% block nav_appointments %}{% endblock %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                Appointments
+            </a>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-label">Staff</div>
+            <a href="{% url 'doctor-list' %}" class="sidebar-link {% block nav_doctors %}{% endblock %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                </svg>
+                Doctors
+            </a>
+        </div>
+
+        {% if user.is_staff %}
+        <div class="sidebar-section">
+            <div class="sidebar-label">Admin</div>
+            <a href="{% url 'admin:index' %}" class="sidebar-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                    <path d="M4.93 4.93a10 10 0 0 0 0 14.14"/>
+                </svg>
+                Admin Panel
+            </a>
+        </div>
+        {% endif %}
+    </aside>
+
+    <!-- Main content -->
+    <main class="main-content">
+
+        <!-- Flash messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
+
+    </main>
+</div>
+
+{% else %}
+    <!-- Unauthenticated: just render the page (login/signup) -->
+    {% block auth_content %}{% endblock %}
+{% endif %}
+
+{% block extra_js %}{% endblock %}
+</body>
+</html> {% endcomment %}

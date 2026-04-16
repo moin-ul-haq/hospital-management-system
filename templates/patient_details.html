@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Patient Details | HMS{% endblock %}
+
+{% block content %}
+<h2>Patient Details</h2>
+<p><strong>Name:</strong> {{ patient.user.name }}</p>
+<p><strong>Email:</strong> {{ patient.user.email }}</p>
+<p><strong>Blood Group:</strong> {{ patient.blood_group }}</p>
+<p><strong>Address:</strong> {{ patient.Address }}</p>
+<p><strong>Date of Birth:</strong> {{ patient.date_of_birth }}</p>
+<p><strong>Phone:</strong> {{ patient.phone }}</p>
+<p><strong>Emergency Contact:</strong> {{ patient.emergency_contact }}</p>
+
+<h3>Medical History</h3>
+<ul>
+  {% for history in patient.medical_histories.all %}
+    <li>
+      <p><strong>Visit Date:</strong> {{ history.visit_date }}</p>
+      <p><strong>Doctor:</strong> {{ history.doctor.name }}</p>
+      <p><strong>Diagnosis:</strong> {{ history.diagnosis }}</p>
+      <p><strong>Treatment:</strong> {{ history.treatment }}</p>
+      <p><strong>Medications:</strong> {{ history.prescribed_medications }}</p>
+      <p><strong>Notes:</strong> {{ history.notes }}</p>
+    </li>
+  {% empty %}
+    <li>No medical history available.</li>
+  {% endfor %}
+</ul>
+<h3>Appointments</h3>
+<ul>
+  {% for appointment in patient.appointments.all %}
+    <li>
+      {{ appointment.appointment_date }} {{ appointment.appointment_time }}
+      with Dr. {{ appointment.doctor.user.name }} - {{ appointment.status }}
+    </li>
+  {% empty %}
+    <li>No appointments available.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

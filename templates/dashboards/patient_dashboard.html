@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Patient Dashboard | HMS{% endblock %}
+
+{% block content %}
+<h2>Patient Dashboard</h2>
+{% if patient %}
+  <p>Welcome, {{ patient.user.name }}.</p>
+  <p><a href="{% url 'book_appointment' %}">Book a new appointment</a></p>
+  <h3>Your Appointments</h3>
+  <ul>
+    {% for appointment in appointments %}
+      <li>
+        {{ appointment.appointment_date }} {{ appointment.appointment_time }}
+        with Dr. {{ appointment.doctor.user.name }} - {{ appointment.status }}
+        {% if appointment.status != 'cancelled' and appointment.status != 'completed' %}
+          <form method="post" action="{% url 'appointment-cancel' appointment.pk %}">
+            {% csrf_token %}
+            <button type="submit">Cancel Appointment</button>
+          </form>
+        {% endif %}
+      </li>
+    {% empty %}
+      <li>No appointments found.</li>
+    {% endfor %}
+  </ul>
+
+  <h3>Your Medical History</h3>
+  <ul>
+    {% for history in histories %}
+      <li>
+        {{ history.visit_date }} - Dr. {{ history.doctor.name }} - {{ history.diagnosis }}
+      </li>
+    {% empty %}
+      <li>No medical history found.</li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>Your patient profile was not found.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Login | HMS{% endblock %}
+
+{% block content %}
+<h2>Sign in</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <input type="hidden" name="next" value="{{ request.GET.next }}">
+  <button type="submit">Login</button>
+</form>
+<p><a href="{% url 'register' %}">Create an account</a></p>
+{% endblock %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login | HMS</title>
+</head>
+<body>
+  <h2>Sign in</h2>
+  <p>Hospital Management System</p>
+
+  {% if messages %}
+    {% for message in messages %}
+      <p>{{ message }}</p>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+
+    {# Renders all form fields with labels and errors #}
+    {{ form.as_p }}
+
+    {# Preserve 'next' redirect param #}
+    <input type="hidden" name="next"
+           value="{{ request.GET.next }}">
+
+    <button type="submit">Login</button>
+  </form>
+
+  <p>
+    Don't have an account?
+    <a href="{% url 'register' %}">Sign up</a>
+  </p>
+</body>
+</html>

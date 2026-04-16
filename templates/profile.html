@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile | HMS{% endblock %}
+
+{% block content %}
+<h2>Profile</h2>
+<p><strong>Name:</strong> {{ request.user.name }}</p>
+<p><strong>Username:</strong> {{ request.user.username }}</p>
+<p><strong>Email:</strong> {{ request.user.email }}</p>
+<p><strong>Role:</strong> {{ request.user.role }}</p>
+
+{% if patient_profile %}
+  <h3>Patient Profile</h3>
+  <p><strong>Blood Group:</strong> {{ patient_profile.blood_group }}</p>
+  <p><strong>Address:</strong> {{ patient_profile.Address }}</p>
+  <p><strong>Date of Birth:</strong> {{ patient_profile.date_of_birth }}</p>
+  <p><strong>Phone:</strong> {{ patient_profile.phone }}</p>
+  <p><strong>Emergency Contact:</strong> {{ patient_profile.emergency_contact }}</p>
+
+  <h4>Medical History</h4>
+  <ul>
+    {% for history in patient_profile.medical_histories.all %}
+      <li>
+        <p><strong>Visit Date:</strong> {{ history.visit_date }}</p>
+        <p><strong>Doctor:</strong> {{ history.doctor.name }}</p>
+        <p><strong>Diagnosis:</strong> {{ history.diagnosis }}</p>
+        <p><strong>Treatment:</strong> {{ history.treatment }}</p>
+        <p><strong>Medications:</strong> {{ history.prescribed_medications }}</p>
+        <p><strong>Notes:</strong> {{ history.notes }}</p>
+      </li>
+    {% empty %}
+      <li>No medical history available.</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% if doctor_profile %}
+  <h3>Doctor Profile</h3>
+  <p><strong>Specialization:</strong> {{ doctor_profile.specialization }}</p>
+  <p><strong>Qualification:</strong> {{ doctor_profile.qualification }}</p>
+  <p><strong>Experience Years:</strong> {{ doctor_profile.experience_years }}</p>
+  <p><strong>Phone:</strong> {{ doctor_profile.phone }}</p>
+  <p><strong>Available From:</strong> {{ doctor_profile.available_from }}</p>
+  <p><strong>Available To:</strong> {{ doctor_profile.available_to }}</p>
+{% endif %}
+{% endblock %}

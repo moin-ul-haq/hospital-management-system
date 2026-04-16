@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Patients | HMS{% endblock %}
+
+{% block content %}
+<h2>Patients</h2>
+<ul>
+  {% for patient in patients %}
+    <li><a href="{% url 'patient_detail' patient.pk %}">{{ patient.user.name }}</a></li>
+  {% empty %}
+    <li>No patients found.</li>
+  {% endfor %}
+</ul>
+{% endblock %}<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patients</title>
+</head>
+<body>
+    <center>All patients Available</center>
+    <ul>
+
+        {% for patient in patients %}
+        <li>
+            <a href="{% url "patient_detail" patient.pk %}">{{patient.user.name}}</a>
+
+        </li>
+        {% endfor %}
+    </ul>
+    </body>
+</html>

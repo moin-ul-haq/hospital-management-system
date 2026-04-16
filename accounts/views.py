@@ -13,6 +13,80 @@ from hospitalmanagementsystem.permissions import IsAdmin
 from rest_framework.authentication import SessionAuthentication
 from .tasks import send_login_email,send_signup_email
 from hospitalmanagementsystem import settings
+from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import login,logout
+from django.contrib.messages.views import SuccessMessageMixin
+from django.views.generic import CreateView, FormView
+from .forms import SignupForm
+from django.views import View
+from django.urls import reverse_lazy
+from django.shortcuts import redirect
+from django.contrib import messages
+
+
+
+class SignupView(SuccessMessageMixin,CreateView):
+    form_class=SignupForm
+    template_name='register.html'
+    success_url=reverse_lazy('dashboard')
+    success_message='User Created Successfully'
+
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('homepage')
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        user = form.save()
+        login(self.request, user)  # auto-login after signup
+        return super().form_valid(form)
+    
+
+class LoginView(SuccessMessageMixin,FormView):
+    form_class=AuthenticationForm
+    template_name='login.html'
+    success_message='Logged in Successfully'
+    success_url=reverse_lazy('dashboard')
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('dashboard')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request  # AuthenticationForm needs request
+        return kwargs
+
+    def form_valid(self, form):
+        login(self.request, form.get_user())
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        # Respect 'next' param
+        return self.request.GET.get('next') or self.request.POST.get('next') or self.success_url
+
+
+class DashboardRedirectView(LoginRequiredMixin, View):
+    def get(self, request):
+        role = getattr(request.user, 'role', None)
+
+        if role == 'patient':
+            return redirect('patient_dashboard')
+        if role == 'doctor':
+            return redirect('doctor_dashboard')
+        if role == 'receptionist':
+            return redirect('receptionist_dashboard')
+        return redirect('admin_dashboard')
+
+
+class LogoutView(LoginRequiredMixin, View):
+    def post(self, request):
+        logout(request)
+        messages.info(request, 'Logged out successfully.')
+        return redirect('login')
 
 
 class AuthViewSet(viewsets.ViewSet):
@@ -112,3 +186,6 @@ class UserViewSet(viewsets.ViewSet):
         user.role = new_role
         user.save()
         return Response({'success': f'Role changed to {new_role}'})
+
+
+
